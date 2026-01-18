@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Skool Keywords Outreach</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      margin-top: 6px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    .note { font-size: 0.9rem; color: #555; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <h1>Skool Leads Outreach</h1>
+
+  <form
+    id="skoolForm"
+    action=""
+    method="POST"
+  >
+    <label for="skoolKeywords">Skool keywords to scrape leads</label>
+    <input
+      type="text"
+      id="skoolKeywords"
+      name="skoolKeywords"
+      placeholder="coaching, mastermind, consulting"
+      required
+    />
+    <div class="note">Separate multiple keywords with commas or enter single keywords.</div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    function normalizeKeywords(str) {
+      return str
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .join(',');
+    }
+
+    document.getElementById('skoolForm').addEventListener('submit', function (e) {
+      const input = document.getElementById('skoolKeywords');
+      input.value = normalizeKeywords(input.value);
+      // Normal form POST (no fetch) so n8n receives form‑urlencoded
+    });
+  </script>
+
+</body>
+</html>
