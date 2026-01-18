@@ -1,0 +1,495 @@
+{
+  "name": "automated personalized cold email outreach skool dragos",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9c83304b-ca21-4c65-adb6-9ec9b240918b",
+              "name": "skool keywords",
+              "value": "={{ $json.body.skoolKeywords.split(',').map(s => s.trim()).filter(s => s.length > 0) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        176
+      ],
+      "id": "40610e37-969f-4213-95f6-14e3d663bb44",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "efc62d07-c4ce-429f-bcb4-59aa1b430c82",
+              "leftValue": "={{ $json.body.skoolKeywords }}",
+              "rightValue": "^https:\\/\\/www\\.skool\\.com\\/discovery\\?q=[^&]+$",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        192
+      ],
+      "id": "8fd7fd01-230d-49be-a053-8f8a38c5e6f2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "zQGCiPzC5yS3mR9wI",
+          "mode": "list",
+          "cachedResultName": "Skool Email Scraper (scraper-mind/skool-email-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/zQGCiPzC5yS3mR9wI/input"
+        },
+        "customBody": "={\n    \"keywords\": {{ $json['skool keywords'] }},\n    \"location\": \"\",\n    \"platform\": \"Skool\",\n    \"customDomains\": [\n        \"@gmail.com\"\n    ],\n    \"maxEmails\": 500,\n    \"engine\": \"cost-effective\"\n}",
+        "timeout": 3600
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        272,
+        176
+      ],
+      "id": "ab587fe0-4756-4e5d-a1cb-a6bcbd3aa78c",
+      "name": "Run an Actor and get dataset",
+      "retryOnFail": true,
+      "credentials": {
+        "apifyApi": {
+          "id": "aKiissAMhPe4WNEQ",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 15,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        512,
+        176
+      ],
+      "id": "ebb89bd7-4288-400f-8ad2-085456b2fa09",
+      "name": "Loop Over Items",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "amount": 150
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        192
+      ],
+      "id": "b6a55355-81fb-4e1c-a214-f12bb6a5d46a",
+      "name": "Wait",
+      "webhookId": "9eebc65c-19a8-4e60-acf5-ff50ce9b697b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b0d2a4a-2acc-44d5-92bb-9557e2ddc6e5",
+              "name": "Account",
+              "value": "={{ $('Loop Over Items').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "68c84665-1add-40cd-a3eb-5ad6f35c09fb",
+              "name": "Email Address",
+              "value": "={{ $('Loop Over Items').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "e1cffd4d-7a6b-4525-926a-7eefbb631987",
+              "name": "Biography",
+              "value": "={{ $('Loop Over Items').item.json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "9f569698-6b5e-4443-a4b7-b05e4b291e66",
+              "name": "Subject of Email",
+              "value": "={{ $('Email subject and body').item.json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "77fe9afd-3c7a-4ed0-9894-04b24e0ae590",
+              "name": "Body of Email",
+              "value": "={{ $('Email subject and body').item.json.Body }}",
+              "type": "string"
+            },
+            {
+              "id": "3c8d8a4e-7bc9-4b2b-9cee-b237fdb939d6",
+              "name": "Status",
+              "value": "=blank",
+              "type": "string"
+            },
+            {
+              "id": "401742be-34ba-4978-9d1a-3a324acbd3a6",
+              "name": "Email Sender",
+              "value": "=lucas@cg.coachclub.site",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        272
+      ],
+      "id": "8318c8f0-d8c8-4fd8-a3db-637b1d678f6c",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cwrGQQMlNUbtW0iumyLgkVkDFdlpx8qA0yX2FWJjnRc",
+          "mode": "list",
+          "cachedResultName": "Reply data outreach 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cwrGQQMlNUbtW0iumyLgkVkDFdlpx8qA0yX2FWJjnRc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Blad1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cwrGQQMlNUbtW0iumyLgkVkDFdlpx8qA0yX2FWJjnRc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Account": "={{ $json.Account }}",
+            "Email Adress": "={{ $json['Email Address'] }}",
+            "Biography": "={{ $json.Biography }}",
+            "Subject of Email": "={{ $json['Subject of Email'] }}",
+            "Body of Email": "={{ $json['Body of Email'] }}",
+            "Status": "={{ $json.Status }}",
+            "Email Sender": "={{ $json['Email Sender'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account",
+              "displayName": "Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Adress",
+              "displayName": "Email Adress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Biography",
+              "displayName": "Biography",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject of Email",
+              "displayName": "Subject of Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Body of Email",
+              "displayName": "Body of Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Sender",
+              "displayName": "Email Sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        -80
+      ],
+      "id": "c549d242-8899-4c52-be9e-15d0a791a21f",
+      "name": "Add data to skool sheet",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "twyhvKjDcfNqYilX",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "acf99885-53e6-4c28-a209-c71a80d28bc6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        192
+      ],
+      "id": "3900f930-041e-4f8e-a22d-f0e6b6123141",
+      "name": "Webhook",
+      "webhookId": "acf99885-53e6-4c28-a209-c71a80d28bc6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6372589a-82e6-4398-9841-ea14d3edc36a",
+              "name": "Subject",
+              "value": "About your energy and health",
+              "type": "string"
+            },
+            {
+              "id": "02e7335a-638c-489f-b427-8a7d4ccbd705",
+              "name": "Body",
+              "value": "Feeling low on energy, unfocused, or stuck despite knowing what you should be doing for \nyour health can be really frustrating.\n\nMost men I work with are trying to improve, but busy schedules, inconsistent routines, and \nuncertainty about what actually works hold them back from reaching their full potential.\n\nI help men rebuild their health, increase energy, improve focus, and feel stronger with \nsimple, actionable plans that fit their lifestyle.\n\nI offer a short call where I can walk you through how I help clients get results in 90 days \nwithout wasting time or guessing.\n\nIf this sounds useful, reply this email with \"YES\" for a quick chat this week\n\n- Dragos\n\n",
+              "type": "string"
+            },
+            {
+              "id": "1b7f7dce-154c-4a6d-8df4-a0d60dd0e141",
+              "name": "Email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        192
+      ],
+      "id": "8a22f5ef-613c-4acc-a2dc-fa9681f6e6d7",
+      "name": "Email subject and body"
+    },
+    {
+      "parameters": {
+        "fromEmail": "lucas@cg.coachclub.site",
+        "toEmail": "={{ $json.Email }}",
+        "subject": "={{ $json.Subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.Body }}",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "primaldragos@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        192
+      ],
+      "id": "3402ef5d-bb0d-428d-b1ae-dbedaf6c2fbb",
+      "name": "Send email",
+      "webhookId": "440ef936-5030-4997-82d0-30e0d50e264e",
+      "credentials": {
+        "smtp": {
+          "id": "moBfUUVbNj3FvIYP",
+          "name": "SMTP account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor and get dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor and get dataset": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Add data to skool sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email subject and body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email subject and body": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4bb5960-91d7-4a70-b354-b6c341bd5248",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "72830bf432026c6e2413b0d51581a1166b5a9283b21862c2057ffdeb236dd2bf"
+  },
+  "id": "m7nQOsnrFloskRmv",
+  "tags": []
+}
